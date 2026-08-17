@@ -1,7 +1,11 @@
+import pytest
+
 from factories.booking_factory import create_booking_payload
 from utils.response_validators import assert_status_code
 
 
+@pytest.mark.regression
+@pytest.mark.booking
 def test_delete_booking(booking_client, auth_token):
     booking_payload = create_booking_payload(
         totalprice=600,

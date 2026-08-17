@@ -1,8 +1,12 @@
+import pytest
+
 from factories.booking_factory import create_booking_payload
 from utils.response_validators import assert_json_content_type, assert_status_code
 from utils.schema_validator import validate_schema
 
 
+@pytest.mark.regression
+@pytest.mark.booking
 def test_filter_bookings_by_name(booking_client):
     # Create unique names to avoid matching another user's booking.
 
