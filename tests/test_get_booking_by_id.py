@@ -54,3 +54,14 @@ def test_get_booking_by_id():
     assert "application/json" in booking_response.headers["Content-Type"]
     assert booking_response.elapsed.total_seconds() < 5
 
+
+
+def test_get_nonexisting_booking():
+    nonexisting_booking_id = 999999999
+
+    response = requests.get(f"{BASE_URL}/booking/{nonexisting_booking_id}", timeout=10)
+
+    print("Status code : ", response.status_code)
+    print("Response : ", response.text)
+
+    assert response.status_code == 404
