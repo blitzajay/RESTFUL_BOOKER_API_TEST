@@ -10,6 +10,8 @@ configuration.
 See the [framework architecture](docs/architecture.md) for the component design,
 request flow, validation strategy, and interview-ready explanation.
 
+![Restful Booker API test framework architecture](docs/images/framework-architecture.png)
+
 ## Run the Tests
 
 ```bash

@@ -2,6 +2,11 @@
 
 ## Component Diagram
 
+![Restful Booker API test framework architecture](images/framework-architecture.png)
+
+<details>
+<summary>Editable Mermaid source</summary>
+
 ```mermaid
 flowchart TB
     subgraph TestLayer["Test Layer"]
@@ -46,6 +51,8 @@ flowchart TB
     Tests --> BusinessAssertions
     SchemaValidator -->|"loads"| Schemas
 ```
+
+</details>
 
 ## Request Flow
 
