@@ -1,29 +1,14 @@
-from uuid import uuid4
-import requests
+from factories.booking_factory import create_booking_payload
+from utils.response_validators import assert_json_content_type, assert_status_code
+from utils.schema_validator import validate_schema
 
-from config.settings import BASE_URL, DEFAULT_TIMEOUT
 
-def test_partial_update_booking(auth_token):
-    unique_value = uuid4().hex[:8]
-    original_payload = {
-        "firstname": f"Ajay{unique_value}",
-        "lastname": f"Kumar{unique_value}",
-        "totalprice": 500,
-        "depositpaid": False,
-        "bookingdates": {
-            "checkin": "2026-10-01",
-            "checkout": "2026-10-05",
-        },
-        "additionalneeds": "Breakfast",
-    }
+def test_partial_update_booking(booking_client, auth_token):
+    original_payload = create_booking_payload()
 
-    create_response = requests.post(
-        BASE_URL + "/booking",
-        json=original_payload,
-        timeout=DEFAULT_TIMEOUT,
-    )
+    create_response = booking_client.create_booking(original_payload)
 
-    assert create_response.status_code == 200
+    assert_status_code(create_response, 200)
 
     booking_id = create_response.json()["bookingid"]
 
@@ -35,18 +20,17 @@ def test_partial_update_booking(auth_token):
     }
 
     # Act: partially update the booking.
-    patch_response = requests.patch(
-        f"{BASE_URL}/booking/{booking_id}",
-        json=partial_payload,
-        cookies={"token": auth_token},
-        headers={"Accept": "application/json"},
-        timeout=DEFAULT_TIMEOUT,
+    patch_response = booking_client.partial_update_booking(
+        booking_id,
+        partial_payload,
+        auth_token,
     )
 
-    assert patch_response.status_code == 200
-    assert "application/json" in patch_response.headers["Content-Type"]
+    assert_status_code(patch_response, 200)
+    assert_json_content_type(patch_response)
 
     updated_booking = patch_response.json()
+    validate_schema(updated_booking, "booking_schema.json")
 
     print("PATCH response:", updated_booking)
 
@@ -61,18 +45,10 @@ def test_partial_update_booking(auth_token):
     assert updated_booking["bookingdates"] == original_payload["bookingdates"]
 
     # Verify persisted state.
-    get_response = requests.get(
-        f"{BASE_URL}/booking/{booking_id}",
-        timeout=DEFAULT_TIMEOUT,
-    )
+    get_response = booking_client.get_booking(booking_id)
 
-    assert get_response.status_code == 200
+    assert_status_code(get_response, 200)
     assert get_response.json() == updated_booking
-
-
-
-
-
 
 
 

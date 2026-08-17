@@ -1,16 +1,16 @@
-import requests
+from utils.response_validators import assert_json_content_type, assert_status_code
+from utils.schema_validator import validate_schema
 
-from config.settings import BASE_URL, DEFAULT_TIMEOUT
 
-def test_get_all_booking_ids():
-    # response = requests.get(f"{BASE_URL}/booking", timeout=10)
-    response = requests.get(BASE_URL+"/booking", timeout=DEFAULT_TIMEOUT)
+def test_get_all_booking_ids(booking_client):
+    response = booking_client.get_all_bookings()
 
     # print(response.json())
 
-    assert response.status_code == 200
+    assert_status_code(response, 200)
 
     body = response.json()
+    validate_schema(body, "booking_ids_schema.json")
     assert isinstance(body, list)
     assert len(body) > 0
 
@@ -21,7 +21,6 @@ def test_get_all_booking_ids():
         assert booking["bookingid"] > 0
 
 
-    assert "application/json" in response.headers["Content-Type"]
+    assert_json_content_type(response)
 
     assert response.elapsed.total_seconds() < 5
-

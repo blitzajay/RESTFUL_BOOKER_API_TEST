@@ -1,70 +1,47 @@
-from uuid import uuid4
-
-import requests
-
-
-from config.settings import BASE_URL, DEFAULT_TIMEOUT
+from factories.booking_factory import create_booking_payload
+from utils.response_validators import assert_json_content_type, assert_status_code
+from utils.schema_validator import validate_schema
 
 
-def test_update_complete_booking(auth_token):
-    unique_value = uuid4().hex[:8]
-
-    original_payload = {
-        "firstname": f"Ajay{unique_value}",
-        "lastname": f"Kumar{unique_value}",
-        "totalprice": 500,
-        "depositpaid": False,
-        "bookingdates": {
-            "checkin": "2026-10-01",
-            "checkout": "2026-10-05",
-        },
-        "additionalneeds": "Breakfast",
-    }
+def test_update_complete_booking(booking_client, auth_token):
+    original_payload = create_booking_payload()
 
     # Arrange: create a booking.
-    create_response = requests.post(
-        BASE_URL + "/booking",
-        json=original_payload,
-        timeout=DEFAULT_TIMEOUT,
-    )
+    create_response = booking_client.create_booking(original_payload)
 
-    assert create_response.status_code == 200
+    assert_status_code(create_response, 200)
 
     booking_id = create_response.json()["bookingid"]
 
-    updated_payload = {
-        "firstname": f"Updated{unique_value}",
-        "lastname": f"Booking{unique_value}",
-        "totalprice": 900,
-        "depositpaid": True,
-        "bookingdates": {
+    updated_payload = create_booking_payload(
+        firstname="UpdatedAjay",
+        lastname="UpdatedKumar",
+        totalprice=900,
+        depositpaid=True,
+        bookingdates={
             "checkin": "2026-11-01",
             "checkout": "2026-11-10",
         },
-        "additionalneeds": "Late checkout",
-    }
+        additionalneeds="Late checkout",
+    )
 
     # Act: completely replace the booking.
-    update_response = requests.put(
-        f"{BASE_URL}/booking/{booking_id}",
-        json=updated_payload,
-        cookies={"token": auth_token},
-        headers={"Accept": "application/json"},
-        timeout=DEFAULT_TIMEOUT,
+    update_response = booking_client.update_booking(
+        booking_id,
+        updated_payload,
+        auth_token,
     )
 
     print("Update response:", update_response.json())
 
     # Assert the update response.
-    assert update_response.status_code == 200
-    assert "application/json" in update_response.headers["Content-Type"]
+    assert_status_code(update_response, 200)
+    assert_json_content_type(update_response)
+    validate_schema(update_response.json(), "booking_schema.json")
     assert update_response.json() == updated_payload
 
     # Verify the persisted booking.
-    get_response = requests.get(
-        f"{BASE_URL}/booking/{booking_id}",
-        timeout=DEFAULT_TIMEOUT,
-    )
+    get_response = booking_client.get_booking(booking_id)
 
-    assert get_response.status_code == 200
+    assert_status_code(get_response, 200)
     assert get_response.json() == updated_payload

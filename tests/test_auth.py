@@ -1,25 +1,19 @@
-import requests
 import pytest
-from config.settings import BASE_URL, DEFAULT_TIMEOUT
 
+from utils.response_validators import assert_json_content_type, assert_status_code
 
-def test_create_auth_token():
+def test_create_auth_token(auth_client):
     auth_payload = {
         "username": "admin",
         "password": "password123",
     }
 
-    response = requests.post(
-        BASE_URL + "/auth",
-        json=auth_payload,
-        headers={"Accept": "application/json"},
-        timeout=DEFAULT_TIMEOUT,
-    )
+    response = auth_client.create_token(auth_payload)
 
     print("Auth response:", response.json())
 
-    assert response.status_code == 200
-    assert "application/json" in response.headers["Content-Type"]
+    assert_status_code(response, 200)
+    assert_json_content_type(response)
 
     response_body = response.json()
 
@@ -33,19 +27,15 @@ def test_create_auth_token():
     reason="Known API defect: invalid credentials return 200 instead of 401",
     strict=True,
 )
-def test_authentication_with_invalid_credentials():
+def test_authentication_with_invalid_credentials(auth_client):
     invalid_payload = {
         "username": "wrong-user",
         "password": "wrong-password",
     }
 
-    response = requests.post(
-        BASE_URL + "/auth",
-        json=invalid_payload,
-        timeout=DEFAULT_TIMEOUT,
-    )
+    response = auth_client.create_token(invalid_payload)
 
-    assert response.status_code == 401
+    assert_status_code(response, 401)
 
     response_body = response.json()
 
