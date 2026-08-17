@@ -1,39 +1,20 @@
-from uuid import uuid4
-
-import requests
-
-
-BASE_URL = "https://restful-booker.herokuapp.com"
+from factories.booking_factory import create_booking_payload
+from utils.response_validators import assert_json_content_type, assert_status_code
+from utils.schema_validator import validate_schema
 
 
-def test_filter_bookings_by_name():
+def test_filter_bookings_by_name(booking_client):
     # Create unique names to avoid matching another user's booking.
-    unique_value = uuid4().hex[:8]
 
-    firstname = f"Ajay{unique_value}"
-    lastname = f"Kumar{unique_value}"
+    booking_payload = create_booking_payload(depositpaid=True)
 
-    booking_payload = {
-        "firstname": firstname,
-        "lastname": lastname,
-        "totalprice": 500,
-        "depositpaid": True,
-        "bookingdates": {
-            "checkin": "2026-09-01",
-            "checkout": "2026-09-05",
-        },
-        "additionalneeds": "Breakfast",
-    }
+    firstname = booking_payload["firstname"]
+    lastname = booking_payload["lastname"]
 
     # Arrange: create our own booking.
-    create_response = requests.post(
-        BASE_URL + "/booking",
-        json=booking_payload,
-        headers={"Accept": "application/json"},
-        timeout=10,
-    )
+    create_response = booking_client.create_booking(booking_payload)
 
-    assert create_response.status_code == 200
+    assert_status_code(create_response, 200)
 
     created_booking = create_response.json()
 
@@ -48,20 +29,17 @@ def test_filter_bookings_by_name():
         "lastname": lastname,
     }
 
-    filter_response = requests.get(
-        BASE_URL + "/booking",
-        params=params,
-        timeout=10,
-    )
+    filter_response = booking_client.get_all_bookings(params=params)
 
     print("Request URL:", filter_response.url)
     print("Filtered response:", filter_response.json())
 
     # Assert: validate the filtered response.
-    assert filter_response.status_code == 200
-    assert "application/json" in filter_response.headers["Content-Type"]
+    assert_status_code(filter_response, 200)
+    assert_json_content_type(filter_response)
 
     filtered_bookings = filter_response.json()
+    validate_schema(filtered_bookings, "booking_ids_schema.json")
 
     assert isinstance(filtered_bookings, list)
     assert len(filtered_bookings) > 0
