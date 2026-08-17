@@ -1,11 +1,11 @@
 import requests
 
-BASE_URL = "https://restful-booker.herokuapp.com"
+from config.settings import BASE_URL, DEFAULT_TIMEOUT
 
 def test_get_booking_by_id():
     # First request: obtain valid booking IDs
 
-    list_response = requests.get(BASE_URL+"/booking", timeout=10)
+    list_response = requests.get(BASE_URL+"/booking", timeout=DEFAULT_TIMEOUT)
     assert list_response.status_code == 200
 
     bookings = list_response.json()
@@ -15,7 +15,7 @@ def test_get_booking_by_id():
 
     # Second request: retrieve the selected booking
 
-    booking_response = requests.get(f"{BASE_URL}/booking/{booking_id}", timeout=10)
+    booking_response = requests.get(f"{BASE_URL}/booking/{booking_id}", timeout=DEFAULT_TIMEOUT)
 
     assert booking_response.status_code == 200
 
@@ -59,7 +59,7 @@ def test_get_booking_by_id():
 def test_get_nonexisting_booking():
     nonexisting_booking_id = 999999999
 
-    response = requests.get(f"{BASE_URL}/booking/{nonexisting_booking_id}", timeout=10)
+    response = requests.get(f"{BASE_URL}/booking/{nonexisting_booking_id}", timeout=DEFAULT_TIMEOUT)
 
     print("Status code : ", response.status_code)
     print("Response : ", response.text)

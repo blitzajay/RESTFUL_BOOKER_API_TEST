@@ -1,8 +1,7 @@
 import pytest
 import requests
 
-
-BASE_URL = "https://restful-booker.herokuapp.com"
+from config.settings import BASE_URL, DEFAULT_TIMEOUT
 
 
 @pytest.fixture(scope="session")
@@ -15,7 +14,7 @@ def auth_token():
     response = requests.post(
         BASE_URL + "/auth",
         json=auth_payload,
-        timeout=10,
+        timeout=DEFAULT_TIMEOUT,
     )
 
     assert response.status_code == 200

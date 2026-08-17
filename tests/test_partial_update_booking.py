@@ -1,7 +1,7 @@
 from uuid import uuid4
 import requests
 
-BASE_URL = "https://restful-booker.herokuapp.com"
+from config.settings import BASE_URL, DEFAULT_TIMEOUT
 
 def test_partial_update_booking(auth_token):
     unique_value = uuid4().hex[:8]
@@ -20,7 +20,7 @@ def test_partial_update_booking(auth_token):
     create_response = requests.post(
         BASE_URL + "/booking",
         json=original_payload,
-        timeout=10,
+        timeout=DEFAULT_TIMEOUT,
     )
 
     assert create_response.status_code == 200
@@ -40,7 +40,7 @@ def test_partial_update_booking(auth_token):
         json=partial_payload,
         cookies={"token": auth_token},
         headers={"Accept": "application/json"},
-        timeout=10,
+        timeout=DEFAULT_TIMEOUT,
     )
 
     assert patch_response.status_code == 200
@@ -63,7 +63,7 @@ def test_partial_update_booking(auth_token):
     # Verify persisted state.
     get_response = requests.get(
         f"{BASE_URL}/booking/{booking_id}",
-        timeout=10,
+        timeout=DEFAULT_TIMEOUT,
     )
 
     assert get_response.status_code == 200

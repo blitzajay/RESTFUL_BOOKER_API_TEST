@@ -1,10 +1,10 @@
 import requests
 
-BASE_URL = "https://restful-booker.herokuapp.com"
+from config.settings import BASE_URL, DEFAULT_TIMEOUT
 
 def test_get_all_booking_ids():
     # response = requests.get(f"{BASE_URL}/booking", timeout=10)
-    response = requests.get(BASE_URL+"/booking", timeout=10)
+    response = requests.get(BASE_URL+"/booking", timeout=DEFAULT_TIMEOUT)
 
     # print(response.json())
 

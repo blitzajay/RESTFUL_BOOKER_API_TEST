@@ -1,7 +1,6 @@
 import requests
 import pytest
-
-BASE_URL = "https://restful-booker.herokuapp.com"
+from config.settings import BASE_URL, DEFAULT_TIMEOUT
 
 
 def test_create_auth_token():
@@ -14,7 +13,7 @@ def test_create_auth_token():
         BASE_URL + "/auth",
         json=auth_payload,
         headers={"Accept": "application/json"},
-        timeout=10,
+        timeout=DEFAULT_TIMEOUT,
     )
 
     print("Auth response:", response.json())
@@ -43,7 +42,7 @@ def test_authentication_with_invalid_credentials():
     response = requests.post(
         BASE_URL + "/auth",
         json=invalid_payload,
-        timeout=10,
+        timeout=DEFAULT_TIMEOUT,
     )
 
     assert response.status_code == 401

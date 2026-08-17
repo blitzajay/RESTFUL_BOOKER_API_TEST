@@ -2,8 +2,7 @@ from uuid import uuid4
 
 import requests
 
-
-BASE_URL = "https://restful-booker.herokuapp.com"
+from config.settings import BASE_URL, DEFAULT_TIMEOUT
 
 
 def test_filter_bookings_by_name():
@@ -30,7 +29,7 @@ def test_filter_bookings_by_name():
         BASE_URL + "/booking",
         json=booking_payload,
         headers={"Accept": "application/json"},
-        timeout=10,
+        timeout=DEFAULT_TIMEOUT,
     )
 
     assert create_response.status_code == 200
@@ -51,7 +50,7 @@ def test_filter_bookings_by_name():
     filter_response = requests.get(
         BASE_URL + "/booking",
         params=params,
-        timeout=10,
+        timeout=DEFAULT_TIMEOUT,
     )
 
     print("Request URL:", filter_response.url)
