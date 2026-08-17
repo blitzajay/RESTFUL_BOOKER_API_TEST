@@ -1,7 +1,12 @@
+import pytest
+
 from utils.response_validators import assert_json_content_type, assert_status_code
 from utils.schema_validator import validate_schema
 
 
+@pytest.mark.smoke
+@pytest.mark.regression
+@pytest.mark.booking
 def test_get_booking_by_id(booking_client):
     # First request: obtain valid booking IDs
 
@@ -57,6 +62,9 @@ def test_get_booking_by_id(booking_client):
 
 
 
+@pytest.mark.regression
+@pytest.mark.booking
+@pytest.mark.negative
 def test_get_nonexisting_booking(booking_client):
     nonexisting_booking_id = 999999999
 

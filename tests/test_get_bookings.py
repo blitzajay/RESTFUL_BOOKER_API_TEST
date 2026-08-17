@@ -1,7 +1,12 @@
+import pytest
+
 from utils.response_validators import assert_json_content_type, assert_status_code
 from utils.schema_validator import validate_schema
 
 
+@pytest.mark.smoke
+@pytest.mark.regression
+@pytest.mark.booking
 def test_get_all_booking_ids(booking_client):
     response = booking_client.get_all_bookings()
 

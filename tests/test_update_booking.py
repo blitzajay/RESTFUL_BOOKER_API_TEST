@@ -1,8 +1,12 @@
+import pytest
+
 from factories.booking_factory import create_booking_payload
 from utils.response_validators import assert_json_content_type, assert_status_code
 from utils.schema_validator import validate_schema
 
 
+@pytest.mark.regression
+@pytest.mark.booking
 def test_update_complete_booking(booking_client, auth_token):
     original_payload = create_booking_payload()
 

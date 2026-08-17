@@ -2,6 +2,10 @@ import pytest
 
 from utils.response_validators import assert_json_content_type, assert_status_code
 
+
+@pytest.mark.smoke
+@pytest.mark.regression
+@pytest.mark.auth
 def test_create_auth_token(auth_client):
     auth_payload = {
         "username": "admin",
@@ -27,6 +31,9 @@ def test_create_auth_token(auth_client):
     reason="Known API defect: invalid credentials return 200 instead of 401",
     strict=True,
 )
+@pytest.mark.regression
+@pytest.mark.auth
+@pytest.mark.negative
 def test_authentication_with_invalid_credentials(auth_client):
     invalid_payload = {
         "username": "wrong-user",
